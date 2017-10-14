@@ -36,9 +36,9 @@ module DeviseTokenAuth
         @resource.skip_confirmation!
       end
 
-      sign_in(:user, @resource, store: false, bypass: false)
-
       @resource.save!
+
+      sign_in(:user, @resource, store: false, bypass: false)
 
       yield @resource if block_given?
 

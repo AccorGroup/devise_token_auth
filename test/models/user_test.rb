@@ -58,14 +58,14 @@ class UserTest < ActiveSupport::TestCase
     end
 
     describe 'oauth2 authentication' do
-      test 'model should save even if email is blank' do
+      test 'model should not save if email is blank' do
         @resource.provider              = 'facebook'
         @resource.uid                   = 123
         @resource.password              = @password
         @resource.password_confirmation = @password
 
-        assert @resource.save
-        refute @resource.errors.messages[:email]
+        refute @resource.save
+        assert @resource.errors.messages[:email]
       end
     end
 
