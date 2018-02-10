@@ -92,6 +92,17 @@ module DeviseTokenAuth::Concerns::User
 
       token
     end
+
+    def create_token(client_id: nil, token: nil, expiry: nil)
+      client_id ||= SecureRandom.urlsafe_base64(nil, false)
+      token ||= SecureRandom.urlsafe_base64(nil, false)
+      expiry ||= (Time.now + token_lifespan).to_i
+      tokens[client_id] = {
+        token: BCrypt::Password.create(token),
+        expiry: expiry
+      }
+      [client_id, token, expiry]
+    end
   end
 
   module ClassMethods
@@ -172,7 +183,7 @@ module DeviseTokenAuth::Concerns::User
     last_token ||= nil
     token        = SecureRandom.urlsafe_base64(nil, false)
     token_hash   = ::BCrypt::Password.create(token)
-    expiry       = (Time.now + DeviseTokenAuth.token_lifespan).to_i
+    expiry       = (Time.now + token_lifespan).to_i
 
     if self.tokens[client_id] && self.tokens[client_id]['token']
       last_token = self.tokens[client_id]['token']
@@ -267,4 +278,7 @@ module DeviseTokenAuth::Concerns::User
     end
   end
 
+  def token_lifespan
+    DeviseTokenAuth.token_lifespan
+  end
 end
